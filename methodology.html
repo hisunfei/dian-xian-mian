@@ -28,11 +28,15 @@
         .chapter-inner {
             max-width: 640px;
             width: 100%;
+            /* 默认可见，确保无 JS 或手机上也能显示 */
+        }
+        /* 动画增强：只在 JS 启用后生效 */
+        .js-enabled .chapter-inner {
             opacity: 0;
             transform: translateY(40px);
             transition: opacity 0.8s ease, transform 0.8s ease;
         }
-        .chapter.visible .chapter-inner { opacity: 1; transform: translateY(0); }
+        .js-enabled .chapter.visible .chapter-inner { opacity: 1; transform: translateY(0); }
 
         .chapter-num {
             font-size: 12px;
@@ -114,18 +118,21 @@
         .ch2 { background: #f7f6f3; }
         .line-demo { width: 100%; max-width: 400px; height: 120px; margin: 40px auto; }
         .line-demo svg { width: 100%; height: 100%; }
-        .line-demo .line-path { stroke-dasharray: 400; stroke-dashoffset: 400; transition: stroke-dashoffset 1.5s ease; }
-        .ch2.visible .line-demo .line-path { stroke-dashoffset: 0; }
-        .line-demo .dot-a, .line-demo .dot-b { opacity: 0; transition: opacity 0.5s ease; }
-        .ch2.visible .line-demo .dot-a { opacity: 1; transition-delay: 0.2s; }
-        .ch2.visible .line-demo .dot-b { opacity: 1; transition-delay: 1.2s; }
+        .line-demo .line-path { stroke-dasharray: 400; transition: stroke-dashoffset 1.5s ease; }
+        .js-enabled .line-demo .line-path { stroke-dashoffset: 400; }
+        .js-enabled .ch2.visible .line-demo .line-path { stroke-dashoffset: 0; }
+        .line-demo .dot-a, .line-demo .dot-b { transition: opacity 0.5s ease; }
+        .js-enabled .line-demo .dot-a, .js-enabled .line-demo .dot-b { opacity: 0; }
+        .js-enabled .ch2.visible .line-demo .dot-a { opacity: 1; transition-delay: 0.2s; }
+        .js-enabled .ch2.visible .line-demo .dot-b { opacity: 1; transition-delay: 1.2s; }
 
         /* CH3 */
         .ch3 { background: white; }
         .plane-demo { width: 100%; max-width: 400px; height: 200px; margin: 40px auto; }
         .plane-demo svg { width: 100%; height: 100%; }
-        .plane-demo .plane-rect { transform: scaleX(0); transform-origin: left center; transition: transform 1s ease; }
-        .ch3.visible .plane-demo .plane-rect { transform: scaleX(1); }
+        .plane-demo .plane-rect { transform-origin: left center; transition: transform 1s ease; }
+        .js-enabled .plane-demo .plane-rect { transform: scaleX(0); }
+        .js-enabled .ch3.visible .plane-demo .plane-rect { transform: scaleX(1); }
 
         /* CH4 */
         .ch4 { background: #1a1a1a; color: white; }
@@ -137,8 +144,9 @@
         .ch4 .insight em { color: #e74c3c; }
         .loop-visual { margin: 40px auto; width: 240px; height: 240px; }
         .loop-visual svg { width: 100%; height: 100%; }
-        .loop-visual .spiral { stroke-dasharray: 600; stroke-dashoffset: 600; transition: stroke-dashoffset 2s ease; }
-        .ch4.visible .loop-visual .spiral { stroke-dashoffset: 0; }
+        .loop-visual .spiral { stroke-dasharray: 600; transition: stroke-dashoffset 2s ease; }
+        .js-enabled .loop-visual .spiral { stroke-dashoffset: 600; }
+        .js-enabled .ch4.visible .loop-visual .spiral { stroke-dashoffset: 0; }
 
         /* DIVIDER */
         .divider { height: 1px; max-width: 120px; margin: 0 auto; background: #ddd; }
@@ -152,17 +160,20 @@
         }
         .interlude-inner {
             max-width: 640px;
+        }
+        .js-enabled .interlude-inner {
             opacity: 0; transform: translateY(30px);
             transition: opacity 0.8s ease, transform 0.8s ease;
         }
-        .interlude.visible .interlude-inner { opacity: 1; transform: translateY(0); }
+        .js-enabled .interlude.visible .interlude-inner { opacity: 1; transform: translateY(0); }
         .interlude-label { font-size: 12px; letter-spacing: 0.3em; color: #999; margin-bottom: 32px; }
         .interlude-title { font-size: clamp(24px, 4vw, 36px); font-weight: 800; margin-bottom: 48px; }
 
         .size-demo { display: flex; align-items: flex-end; justify-content: center; gap: 32px; margin: 48px 0; }
         .size-item { display: flex; flex-direction: column; align-items: center; gap: 12px; }
-        .size-box { background: #1a1a1a; border-radius: 2px; transition: transform 0.6s ease; transform: scale(0); }
-        .interlude.visible .size-box { transform: scale(1); }
+        .size-box { background: #1a1a1a; border-radius: 2px; transition: transform 0.6s ease; }
+        .js-enabled .size-box { transform: scale(0); }
+        .js-enabled .interlude.visible .size-box { transform: scale(1); }
         .interlude.visible .size-box:nth-child(1) { transition-delay: 0.2s; }
         .interlude.visible .size-box:nth-child(2) { transition-delay: 0.4s; }
         .interlude.visible .size-box:nth-child(3) { transition-delay: 0.6s; }
@@ -176,9 +187,10 @@
             align-items: center; justify-content: flex-end;
             padding-bottom: 16px;
             transition: transform 0.6s ease;
-            transform: scaleY(0); transform-origin: bottom;
+            transform-origin: bottom;
         }
-        .interlude.visible .tone-block { transform: scaleY(1); }
+        .js-enabled .tone-block { transform: scaleY(0); }
+        .js-enabled .interlude.visible .tone-block { transform: scaleY(1); }
         .interlude.visible .tone-block:nth-child(1) { transition-delay: 0.2s; }
         .interlude.visible .tone-block:nth-child(2) { transition-delay: 0.4s; }
         .interlude.visible .tone-block:nth-child(3) { transition-delay: 0.6s; }
@@ -200,10 +212,12 @@
         .method-header {
             text-align: center;
             margin-bottom: 60px;
+        }
+        .js-enabled .method-header {
             opacity: 0; transform: translateY(30px);
             transition: opacity 0.8s ease, transform 0.8s ease;
         }
-        .method-section.visible .method-header { opacity: 1; transform: translateY(0); }
+        .js-enabled .method-section.visible .method-header { opacity: 1; transform: translateY(0); }
         .method-label {
             font-size: 12px; letter-spacing: 0.3em; color: #999; margin-bottom: 20px;
         }
@@ -222,10 +236,12 @@
             align-items: stretch;
             gap: 0;
             margin: 60px 0;
+        }
+        .js-enabled .method-flow {
             opacity: 0; transform: translateY(30px);
             transition: opacity 0.8s ease 0.2s, transform 0.8s ease 0.2s;
         }
-        .method-section.visible .method-flow { opacity: 1; transform: translateY(0); }
+        .js-enabled .method-section.visible .method-flow { opacity: 1; transform: translateY(0); }
 
         .method-col {
             flex: 1;
@@ -260,10 +276,12 @@
             font-weight: 600;
             color: #333;
             line-height: 2;
+        }
+        .js-enabled .method-quote {
             opacity: 0; transform: translateY(20px);
             transition: opacity 0.8s ease 0.4s, transform 0.8s ease 0.4s;
         }
-        .method-section.visible .method-quote { opacity: 1; transform: translateY(0); }
+        .js-enabled .method-section.visible .method-quote { opacity: 1; transform: translateY(0); }
         .method-quote .hl { color: #c0392b; }
 
         /* ===== INDUSTRY SECTION ===== */
@@ -275,10 +293,12 @@
         .industry-header {
             text-align: center;
             margin-bottom: 60px;
+        }
+        .js-enabled .industry-header {
             opacity: 0; transform: translateY(30px);
             transition: opacity 0.8s ease, transform 0.8s ease;
         }
-        .industry-section.visible .industry-header { opacity: 1; transform: translateY(0); }
+        .js-enabled .industry-section.visible .industry-header { opacity: 1; transform: translateY(0); }
         .industry-label { font-size: 12px; letter-spacing: 0.3em; color: #999; margin-bottom: 20px; }
         .industry-title { font-size: clamp(28px, 5vw, 40px); font-weight: 800; margin-bottom: 24px; }
         .industry-subtitle { font-size: 16px; color: #666; line-height: 1.8; max-width: 500px; margin: 0 auto; }
@@ -292,11 +312,13 @@
             background: #fafaf8;
             border-radius: 6px;
             padding: 40px;
+        }
+        .js-enabled .industry-card {
             opacity: 0;
             transform: translateY(30px);
             transition: opacity 0.6s ease, transform 0.6s ease;
         }
-        .industry-section.visible .industry-card { opacity: 1; transform: translateY(0); }
+        .js-enabled .industry-section.visible .industry-card { opacity: 1; transform: translateY(0); }
         .industry-section.visible .industry-card:nth-child(1) { transition-delay: 0.1s; }
         .industry-section.visible .industry-card:nth-child(2) { transition-delay: 0.25s; }
         .industry-section.visible .industry-card:nth-child(3) { transition-delay: 0.4s; }
@@ -373,10 +395,12 @@
         }
         .finale-inner {
             max-width: 600px;
+        }
+        .js-enabled .finale-inner {
             opacity: 0; transform: translateY(30px);
             transition: opacity 1s ease, transform 1s ease;
         }
-        .finale.visible .finale-inner { opacity: 1; transform: translateY(0); }
+        .js-enabled .finale.visible .finale-inner { opacity: 1; transform: translateY(0); }
         .finale-text {
             font-size: clamp(22px, 4vw, 34px);
             font-weight: 800; line-height: 2; color: #1a1a1a;
@@ -845,7 +869,10 @@
 </footer>
 
 <script>
-// 降低阈值，确保手机上也能触发
+// 标记 JS 已启用，激活动画
+document.body.classList.add('js-enabled');
+
+// IntersectionObserver 控制入场动画
 const observer = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
         if (entry.isIntersecting) {
@@ -858,12 +885,12 @@ document.querySelectorAll('.chapter, .interlude, .method-section, .industry-sect
     observer.observe(el);
 });
 
-// 回退机制：3秒后强制显示所有内容，防止手机上 observer 不触发
+// 回退：2秒后强制显示所有内容
 setTimeout(() => {
     document.querySelectorAll('.chapter, .interlude, .method-section, .industry-section, .finale').forEach(el => {
         el.classList.add('visible');
     });
-}, 3000);
+}, 2000);
 </script>
 
 </body>
