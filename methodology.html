@@ -845,17 +845,25 @@
 </footer>
 
 <script>
+// 降低阈值，确保手机上也能触发
 const observer = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
         if (entry.isIntersecting) {
             entry.target.classList.add('visible');
         }
     });
-}, { threshold: 0.15 });
+}, { threshold: 0.01, rootMargin: '0px 0px -50px 0px' });
 
 document.querySelectorAll('.chapter, .interlude, .method-section, .industry-section, .finale').forEach(el => {
     observer.observe(el);
 });
+
+// 回退机制：3秒后强制显示所有内容，防止手机上 observer 不触发
+setTimeout(() => {
+    document.querySelectorAll('.chapter, .interlude, .method-section, .industry-section, .finale').forEach(el => {
+        el.classList.add('visible');
+    });
+}, 3000);
 </script>
 
 </body>
