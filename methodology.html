@@ -1,0 +1,862 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>点线面 · 做事的方法</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: -apple-system, 'PingFang SC', 'Hiragino Sans', 'Microsoft YaHei', sans-serif;
+            background: #f7f6f3;
+            color: #1a1a1a;
+            line-height: 1.8;
+            overflow-x: hidden;
+        }
+
+        .chapter {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 80px 24px;
+            position: relative;
+            overflow: hidden;
+        }
+        .chapter-inner {
+            max-width: 640px;
+            width: 100%;
+            opacity: 0;
+            transform: translateY(40px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+        .chapter.visible .chapter-inner { opacity: 1; transform: translateY(0); }
+
+        .chapter-num {
+            font-size: 12px;
+            letter-spacing: 0.3em;
+            color: #999;
+            margin-bottom: 24px;
+        }
+        .chapter-title {
+            font-size: clamp(28px, 5vw, 42px);
+            font-weight: 800;
+            margin-bottom: 40px;
+            line-height: 1.4;
+        }
+        .chapter-body { font-size: 17px; color: #444; line-height: 2; }
+        .chapter-body p { margin-bottom: 24px; }
+        .chapter-body strong { color: #1a1a1a; }
+
+        .insight {
+            margin: 40px 0;
+            padding: 28px 32px;
+            border-left: 3px solid #1a1a1a;
+            background: white;
+            font-size: 15px;
+            line-height: 1.9;
+            color: #333;
+        }
+        .insight em { font-style: normal; color: #c0392b; font-weight: 700; }
+
+        /* HERO */
+        .hero {
+            background: #1a1a1a;
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 40px 24px;
+        }
+        .hero-dot {
+            width: 12px; height: 12px;
+            background: white; border-radius: 50%;
+            margin-bottom: 40px;
+            animation: pulse 2s ease-in-out infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.5); opacity: 0.6; }
+        }
+        .hero h1 {
+            font-size: clamp(36px, 7vw, 72px);
+            font-weight: 900;
+            letter-spacing: 0.15em;
+            margin-bottom: 16px;
+        }
+        .hero h1 span:nth-child(1) { color: white; }
+        .hero h1 span:nth-child(2) { color: #999; }
+        .hero h1 span:nth-child(3) { color: #555; }
+        .hero-sub { font-size: 16px; color: #666; letter-spacing: 0.3em; margin-bottom: 60px; }
+        .hero-scroll {
+            position: absolute; bottom: 40px;
+            font-size: 12px; color: #555; letter-spacing: 0.2em;
+            animation: bounce 2s ease-in-out infinite;
+        }
+        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(8px); } }
+
+        /* CH1 */
+        .ch1 { background: white; }
+        .point-demo { width: 200px; height: 200px; display: flex; align-items: center; justify-content: center; margin: 40px auto; }
+        .point-demo .dot {
+            width: 16px; height: 16px; background: #1a1a1a; border-radius: 50%;
+            transform: scale(0);
+        }
+        .ch1.visible .point-demo .dot { animation: dotAppear 1s ease forwards; }
+        @keyframes dotAppear { 0% { transform: scale(0); } 60% { transform: scale(1.3); } 100% { transform: scale(1); } }
+
+        /* CH2 */
+        .ch2 { background: #f7f6f3; }
+        .line-demo { width: 100%; max-width: 400px; height: 120px; margin: 40px auto; }
+        .line-demo svg { width: 100%; height: 100%; }
+        .line-demo .line-path { stroke-dasharray: 400; stroke-dashoffset: 400; transition: stroke-dashoffset 1.5s ease; }
+        .ch2.visible .line-demo .line-path { stroke-dashoffset: 0; }
+        .line-demo .dot-a, .line-demo .dot-b { opacity: 0; transition: opacity 0.5s ease; }
+        .ch2.visible .line-demo .dot-a { opacity: 1; transition-delay: 0.2s; }
+        .ch2.visible .line-demo .dot-b { opacity: 1; transition-delay: 1.2s; }
+
+        /* CH3 */
+        .ch3 { background: white; }
+        .plane-demo { width: 100%; max-width: 400px; height: 200px; margin: 40px auto; }
+        .plane-demo svg { width: 100%; height: 100%; }
+        .plane-demo .plane-rect { transform: scaleX(0); transform-origin: left center; transition: transform 1s ease; }
+        .ch3.visible .plane-demo .plane-rect { transform: scaleX(1); }
+
+        /* CH4 */
+        .ch4 { background: #1a1a1a; color: white; }
+        .ch4 .chapter-num { color: #555; }
+        .ch4 .chapter-title { color: white; }
+        .ch4 .chapter-body { color: #aaa; }
+        .ch4 .chapter-body strong { color: white; }
+        .ch4 .insight { border-left-color: #555; background: #222; color: #ccc; }
+        .ch4 .insight em { color: #e74c3c; }
+        .loop-visual { margin: 40px auto; width: 240px; height: 240px; }
+        .loop-visual svg { width: 100%; height: 100%; }
+        .loop-visual .spiral { stroke-dasharray: 600; stroke-dashoffset: 600; transition: stroke-dashoffset 2s ease; }
+        .ch4.visible .loop-visual .spiral { stroke-dashoffset: 0; }
+
+        /* DIVIDER */
+        .divider { height: 1px; max-width: 120px; margin: 0 auto; background: #ddd; }
+
+        /* INTERLUDE */
+        .interlude {
+            min-height: 80vh;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            padding: 80px 24px; text-align: center;
+        }
+        .interlude-inner {
+            max-width: 640px;
+            opacity: 0; transform: translateY(30px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+        .interlude.visible .interlude-inner { opacity: 1; transform: translateY(0); }
+        .interlude-label { font-size: 12px; letter-spacing: 0.3em; color: #999; margin-bottom: 32px; }
+        .interlude-title { font-size: clamp(24px, 4vw, 36px); font-weight: 800; margin-bottom: 48px; }
+
+        .size-demo { display: flex; align-items: flex-end; justify-content: center; gap: 32px; margin: 48px 0; }
+        .size-item { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+        .size-box { background: #1a1a1a; border-radius: 2px; transition: transform 0.6s ease; transform: scale(0); }
+        .interlude.visible .size-box { transform: scale(1); }
+        .interlude.visible .size-box:nth-child(1) { transition-delay: 0.2s; }
+        .interlude.visible .size-box:nth-child(2) { transition-delay: 0.4s; }
+        .interlude.visible .size-box:nth-child(3) { transition-delay: 0.6s; }
+        .size-label { font-size: 13px; color: #999; letter-spacing: 0.1em; }
+        .size-desc { font-size: 14px; color: #666; margin-top: 32px; line-height: 2; text-align: left; max-width: 400px; }
+
+        .tone-demo { display: flex; justify-content: center; gap: 0; margin: 48px 0; border-radius: 4px; overflow: hidden; }
+        .tone-block {
+            width: 120px; height: 160px;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: flex-end;
+            padding-bottom: 16px;
+            transition: transform 0.6s ease;
+            transform: scaleY(0); transform-origin: bottom;
+        }
+        .interlude.visible .tone-block { transform: scaleY(1); }
+        .interlude.visible .tone-block:nth-child(1) { transition-delay: 0.2s; }
+        .interlude.visible .tone-block:nth-child(2) { transition-delay: 0.4s; }
+        .interlude.visible .tone-block:nth-child(3) { transition-delay: 0.6s; }
+        .tone-block.black { background: #1a1a1a; color: #555; }
+        .tone-block.gray { background: #888; color: #ddd; }
+        .tone-block.white { background: #e8e8e8; color: #999; }
+        .tone-label { font-size: 13px; letter-spacing: 0.1em; }
+        .tone-desc { font-size: 14px; color: #666; margin-top: 32px; line-height: 2; text-align: left; max-width: 400px; }
+
+        /* ===== METHOD SECTION ===== */
+        .method-section {
+            background: #f0ede8;
+            padding: 100px 24px;
+        }
+        .method-inner {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .method-header {
+            text-align: center;
+            margin-bottom: 60px;
+            opacity: 0; transform: translateY(30px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+        .method-section.visible .method-header { opacity: 1; transform: translateY(0); }
+        .method-label {
+            font-size: 12px; letter-spacing: 0.3em; color: #999; margin-bottom: 20px;
+        }
+        .method-title {
+            font-size: clamp(28px, 5vw, 40px);
+            font-weight: 800;
+            margin-bottom: 24px;
+        }
+        .method-subtitle {
+            font-size: 16px; color: #666; line-height: 1.8;
+            max-width: 500px; margin: 0 auto;
+        }
+
+        .method-flow {
+            display: flex;
+            align-items: stretch;
+            gap: 0;
+            margin: 60px 0;
+            opacity: 0; transform: translateY(30px);
+            transition: opacity 0.8s ease 0.2s, transform 0.8s ease 0.2s;
+        }
+        .method-section.visible .method-flow { opacity: 1; transform: translateY(0); }
+
+        .method-col {
+            flex: 1;
+            padding: 32px 24px;
+            text-align: center;
+            position: relative;
+        }
+        .method-col:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            right: 0; top: 20%; height: 60%;
+            width: 1px;
+            background: #ccc;
+        }
+        .method-col-icon {
+            margin-bottom: 20px;
+        }
+        .method-col-title {
+            font-size: 20px; font-weight: 800; margin-bottom: 8px;
+        }
+        .method-col-eq {
+            font-size: 14px; color: #c0392b; font-weight: 600; margin-bottom: 16px;
+        }
+        .method-col-desc {
+            font-size: 13px; color: #666; line-height: 1.8;
+        }
+
+        .method-quote {
+            text-align: center;
+            padding: 40px 20px;
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            line-height: 2;
+            opacity: 0; transform: translateY(20px);
+            transition: opacity 0.8s ease 0.4s, transform 0.8s ease 0.4s;
+        }
+        .method-section.visible .method-quote { opacity: 1; transform: translateY(0); }
+        .method-quote .hl { color: #c0392b; }
+
+        /* ===== INDUSTRY SECTION ===== */
+        .industry-section {
+            background: white;
+            padding: 100px 24px;
+        }
+        .industry-inner { max-width: 900px; margin: 0 auto; }
+        .industry-header {
+            text-align: center;
+            margin-bottom: 60px;
+            opacity: 0; transform: translateY(30px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+        .industry-section.visible .industry-header { opacity: 1; transform: translateY(0); }
+        .industry-label { font-size: 12px; letter-spacing: 0.3em; color: #999; margin-bottom: 20px; }
+        .industry-title { font-size: clamp(28px, 5vw, 40px); font-weight: 800; margin-bottom: 24px; }
+        .industry-subtitle { font-size: 16px; color: #666; line-height: 1.8; max-width: 500px; margin: 0 auto; }
+
+        .industry-cards {
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+        }
+        .industry-card {
+            background: #fafaf8;
+            border-radius: 6px;
+            padding: 40px;
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.6s ease, transform 0.6s ease;
+        }
+        .industry-section.visible .industry-card { opacity: 1; transform: translateY(0); }
+        .industry-section.visible .industry-card:nth-child(1) { transition-delay: 0.1s; }
+        .industry-section.visible .industry-card:nth-child(2) { transition-delay: 0.25s; }
+        .industry-section.visible .industry-card:nth-child(3) { transition-delay: 0.4s; }
+        .industry-section.visible .industry-card:nth-child(4) { transition-delay: 0.55s; }
+
+        .card-top {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        .card-icon-wrap {
+            width: 48px; height: 48px;
+            display: flex; align-items: center; justify-content: center;
+            border-radius: 50%;
+            font-size: 24px;
+            flex-shrink: 0;
+        }
+        .card-icon-wrap.mfg { background: #1a1a1a; }
+        .card-icon-wrap.edu { background: #555; }
+        .card-icon-wrap.dev { background: #888; }
+        .card-icon-wrap.writing { background: #bbb; }
+        .card-name { font-size: 22px; font-weight: 800; }
+        .card-tag { font-size: 12px; color: #999; letter-spacing: 0.1em; }
+
+        .card-flow {
+            display: flex;
+            align-items: center;
+            gap: 0;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+        }
+        .flow-step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 16px 20px;
+            flex: 1;
+            min-width: 100px;
+        }
+        .flow-shape { margin-bottom: 8px; }
+        .flow-label {
+            font-size: 14px;
+            font-weight: 700;
+            color: #333;
+        }
+        .flow-sub {
+            font-size: 12px;
+            color: #999;
+            margin-top: 2px;
+        }
+        .flow-arrow {
+            font-size: 18px;
+            color: #ccc;
+            flex-shrink: 0;
+        }
+
+        .card-insight {
+            font-size: 14px;
+            color: #555;
+            line-height: 1.9;
+            padding-left: 20px;
+            border-left: 2px solid #ddd;
+        }
+        .card-insight strong { color: #1a1a1a; }
+
+        /* FINALE */
+        .finale {
+            min-height: 100vh;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            background: white;
+            padding: 80px 24px; text-align: center;
+        }
+        .finale-inner {
+            max-width: 600px;
+            opacity: 0; transform: translateY(30px);
+            transition: opacity 1s ease, transform 1s ease;
+        }
+        .finale.visible .finale-inner { opacity: 1; transform: translateY(0); }
+        .finale-text {
+            font-size: clamp(22px, 4vw, 34px);
+            font-weight: 800; line-height: 2; color: #1a1a1a;
+        }
+        .finale-text .hl { color: #c0392b; }
+        .finale-attr { margin-top: 40px; font-size: 13px; color: #999; letter-spacing: 0.2em; }
+
+        footer {
+            text-align: center; padding: 40px 24px;
+            font-size: 12px; color: #bbb; letter-spacing: 0.1em;
+        }
+
+        @media (max-width: 640px) {
+            .chapter { padding: 60px 20px; }
+            .chapter-body { font-size: 16px; }
+            .insight { padding: 20px 24px; }
+            .method-flow { flex-direction: column; }
+            .method-col:not(:last-child)::after { display: none; }
+            .method-col { border-bottom: 1px solid #ddd; }
+            .method-col:last-child { border-bottom: none; }
+            .industry-card { padding: 28px 20px; }
+            .card-flow { flex-direction: column; }
+            .flow-arrow { transform: rotate(90deg); }
+            .size-demo { gap: 20px; }
+            .tone-block { width: 90px; height: 120px; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ==================== HERO ==================== -->
+<div class="hero">
+    <div class="hero-dot"></div>
+    <h1><span>点</span><span>线</span><span>面</span></h1>
+    <div class="hero-sub">表 象 的 本 质</div>
+    <div class="hero-scroll">↓ 向下滚动</div>
+</div>
+
+<!-- ==================== CH1: 一个点 ==================== -->
+<div class="chapter ch1" data-chapter="1">
+    <div class="chapter-inner">
+        <div class="chapter-num">第一乐章</div>
+        <div class="chapter-title">一个点</div>
+        <div class="chapter-body">
+            <p>一切从一个点开始。</p>
+            <p>你看见桌上有一瓶酱油。你拿起它，倒酱油。倒完，放下。瓶口干干净净，没有一滴酱油顺着瓶身流下来。</p>
+            <p><strong>为什么？</strong></p>
+            <p>因为瓶嘴上有一个小小的缺口。那个缺口，就是一个「点」——一个被设计过的元。它解决了空气回流的问题，让酱油断得干净利落。</p>
+        </div>
+        <div class="point-demo"><div class="dot"></div></div>
+        <div class="insight">
+            <em>点 = 元</em><br>
+            做事的第一步：找到那个最基本的单元。<br>
+            不急着行动，先蹲下来观察——<br>
+            这个事物的「原子」是什么？
+        </div>
+        <div class="chapter-body">
+            <p>《啊！设计》里，佐藤卓让你盯着酱油瓶嘴看，盯着饭团的三角看，盯着纽扣的孔看。每一个「点」都不是随便长的，它为解决一个问题而存在。</p>
+        </div>
+    </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ==================== CH2: 点动起来 ==================== -->
+<div class="chapter ch2" data-chapter="2">
+    <div class="chapter-inner">
+        <div class="chapter-num">第二乐章</div>
+        <div class="chapter-title">点动起来</div>
+        <div class="chapter-body">
+            <p>一个点不会动。但当你把两个点连起来，就有了线。</p>
+            <p>电话线是卷的。为什么不是直的？</p>
+            <p>因为直的线，拉长了收不回去，缩短了拖在地上。卷曲的线，能在「收纳」和「延伸」之间自由切换。这条线，连接了电话机和听筒，也连接了「固定」和「移动」两个状态。</p>
+        </div>
+        <div class="line-demo">
+            <svg viewBox="0 0 400 120">
+                <circle class="dot-a" cx="40" cy="60" r="8" fill="#1a1a1a"/>
+                <path class="line-path" d="M 48 60 Q 80 20, 120 60 Q 160 100, 200 60 Q 240 20, 280 60 Q 320 100, 352 60" fill="none" stroke="#666" stroke-width="2.5" stroke-linecap="round"/>
+                <circle class="dot-b" cx="360" cy="60" r="8" fill="#1a1a1a"/>
+            </svg>
+        </div>
+        <div class="insight">
+            <em>线 = 延伸</em><br>
+            做事的第二步：把元连接起来。<br>
+            因果关系、时间顺序、依赖关系——<br>
+            让孤立的观察形成一条路径。
+        </div>
+        <div class="chapter-body"><p>好的线，像弹簧——能收能放，有弹性。</p></div>
+    </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ==================== CH3: 线展开来 ==================== -->
+<div class="chapter ch3" data-chapter="3">
+    <div class="chapter-inner">
+        <div class="chapter-num">第三乐章</div>
+        <div class="chapter-title">线展开来</div>
+        <div class="chapter-body">
+            <p>线再展开，就成了面。</p>
+            <p>牛奶盒为什么是方的，不是圆的？</p>
+            <p>因为方盒子在运输时可以紧密排列，不浪费空间。一个包装形状的选择，背后是整条物流系统的优化。你看见的是一个盒子，它连接的是工厂、卡车、货架、冰箱。</p>
+        </div>
+        <div class="plane-demo">
+            <svg viewBox="0 0 400 200">
+                <rect class="plane-rect" x="40" y="40" width="320" height="120" fill="#ccc" rx="2"/>
+                <rect x="60" y="60" width="80" height="80" fill="#999" rx="2" opacity="0.6"/>
+                <rect x="160" y="60" width="80" height="80" fill="#aaa" rx="2" opacity="0.6"/>
+                <rect x="260" y="60" width="80" height="80" fill="#bbb" rx="2" opacity="0.6"/>
+            </svg>
+        </div>
+        <div class="insight">
+            <em>面 = 展开</em><br>
+            做事的第三步：看见整个系统。<br>
+            从局部到整体，从线性到立体——<br>
+            在面中看见结构，在结构中行动。
+        </div>
+        <div class="chapter-body">
+            <p>便当盒就是一个面。打开盖子，你看见颜色的搭配、空间的分割、营养的分布。在有限的空间里，创造最大的满足。</p>
+        </div>
+    </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ==================== CH4: 循环 ==================== -->
+<div class="chapter ch4" data-chapter="4">
+    <div class="chapter-inner">
+        <div class="chapter-num">第四乐章</div>
+        <div class="chapter-title">循环</div>
+        <div class="chapter-body">
+            <p>面中又有新的点。</p>
+            <p>你看见了一个系统，然后你发现系统里还有更小的元。你继续观察，继续连接，继续展开。</p>
+            <p><strong>螺旋上升，永无止境。</strong></p>
+        </div>
+        <div class="loop-visual">
+            <svg viewBox="0 0 240 240">
+                <path class="spiral" d="M 120 120 Q 120 80, 150 80 Q 180 80, 180 120 Q 180 160, 140 170 Q 90 180, 70 140 Q 50 90, 100 60 Q 160 30, 200 80 Q 230 140, 180 190 Q 120 230, 60 180 Q 20 120, 70 60" fill="none" stroke="#555" stroke-width="2" stroke-linecap="round"/>
+                <circle cx="120" cy="120" r="4" fill="white"/>
+            </svg>
+        </div>
+        <div class="insight">
+            <em>点 → 线 → 面 → 新点 → 新线 → 新面 ……</em><br>
+            每一次循环，观察的粒度更细，行动的范围更大。
+        </div>
+    </div>
+</div>
+
+<!-- ==================== 间奏：大中小 ==================== -->
+<div class="interlude" data-interlude="size">
+    <div class="interlude-inner">
+        <div class="interlude-label">间 奏</div>
+        <div class="interlude-title">大中小 · 节奏</div>
+        <div class="size-demo">
+            <div class="size-item"><div class="size-box" style="width:80px;height:80px;"></div><div class="size-label">大</div></div>
+            <div class="size-item"><div class="size-box" style="width:48px;height:48px;"></div><div class="size-label">中</div></div>
+            <div class="size-item"><div class="size-box" style="width:24px;height:24px;"></div><div class="size-label">小</div></div>
+        </div>
+        <div class="size-desc">
+            <strong>大</strong>——主导元素，确定方向。<br>
+            <strong>中</strong>——过渡元素，承上启下。<br>
+            <strong>小</strong>——细节元素，丰富层次。<br><br>
+            一首曲子不能全是大鼓，也不能全是三角铁。<br>好的节奏，是三者配合。
+        </div>
+    </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ==================== 间奏：黑白灰 ==================== -->
+<div class="interlude" data-interlude="tone">
+    <div class="interlude-inner">
+        <div class="interlude-label">间 奏</div>
+        <div class="interlude-title">黑白灰 · 力度</div>
+        <div class="tone-demo">
+            <div class="tone-block black"><div class="tone-label">黑</div></div>
+            <div class="tone-block gray"><div class="tone-label">灰</div></div>
+            <div class="tone-block white"><div class="tone-label">白</div></div>
+        </div>
+        <div class="tone-desc">
+            <strong>黑</strong>——强烈的、确定的。关键决策要果断。<br>
+            <strong>白</strong>——留白的、呼吸的。给思考和意外留余地。<br>
+            <strong>灰</strong>——过渡的、弹性的。大多数事情在灰色地带运作。<br><br>
+            一幅画不能全是黑色，也不能全是白色。<br>好的画面，有黑有白有灰。
+        </div>
+    </div>
+</div>
+
+<!-- ==================== 方法论拔高 ==================== -->
+<div class="method-section" data-method>
+    <div class="method-inner">
+        <div class="method-header">
+            <div class="method-label">从设计到万事万物</div>
+            <div class="method-title">点线面，是一种通用方法论</div>
+            <div class="method-subtitle">
+                佐藤卓用酱油瓶和电话线教会我们一件事：<br>
+                看见元，建立连接，展开系统。<br>
+                这个方法不只适用于设计——它适用于一切需要「做好」的事。
+            </div>
+        </div>
+
+        <div class="method-flow">
+            <div class="method-col">
+                <div class="method-col-icon">
+                    <svg width="48" height="48"><circle cx="24" cy="24" r="10" fill="#1a1a1a"/></svg>
+                </div>
+                <div class="method-col-title">点</div>
+                <div class="method-col-eq">找到元</div>
+                <div class="method-col-desc">
+                    拆解到不可再分。<br>
+                    找到那个最基本的单元，<br>
+                    那个自带解释力的「原子」。
+                </div>
+            </div>
+            <div class="method-col">
+                <div class="method-col-icon">
+                    <svg width="48" height="48"><line x1="8" y1="24" x2="40" y2="24" stroke="#666" stroke-width="3" stroke-linecap="round"/></svg>
+                </div>
+                <div class="method-col-title">线</div>
+                <div class="method-col-eq">建立连接</div>
+                <div class="method-col-desc">
+                    把元连起来。<br>
+                    因果、流程、依赖——<br>
+                    让孤立的点形成路径。
+                </div>
+            </div>
+            <div class="method-col">
+                <div class="method-col-icon">
+                    <svg width="48" height="48"><rect x="6" y="6" width="36" height="36" fill="#999" rx="2"/></svg>
+                </div>
+                <div class="method-col-title">面</div>
+                <div class="method-col-eq">展开系统</div>
+                <div class="method-col-desc">
+                    线展开成面。<br>
+                    看见全局和约束，<br>
+                    在结构中行动。
+                </div>
+            </div>
+        </div>
+
+        <div class="method-quote">
+            同一个方法，<span class="hl">不同的行业</span>，<br>
+            同一种节奏。
+        </div>
+    </div>
+</div>
+
+<!-- ==================== 行业应用 ==================== -->
+<div class="industry-section" data-industry>
+    <div class="industry-inner">
+        <div class="industry-header">
+            <div class="industry-label">行 业 应 用</div>
+            <div class="industry-title">万事万物，皆是点线面</div>
+            <div class="industry-subtitle">
+                当你掌握了这个方法，<br>
+                你会在各行各业中看见同样的结构。
+            </div>
+        </div>
+
+        <div class="industry-cards">
+
+            <!-- 生产制造 -->
+            <div class="industry-card">
+                <div class="card-top">
+                    <div class="card-icon-wrap mfg">
+                        <svg width="24" height="24"><circle cx="12" cy="12" r="4" fill="white"/></svg>
+                    </div>
+                    <div>
+                        <div class="card-name">生产制造</div>
+                        <div class="card-tag">零件 → 组件 → 成品</div>
+                    </div>
+                </div>
+                <div class="card-flow">
+                    <div class="flow-step">
+                        <div class="flow-shape">
+                            <svg width="32" height="32"><circle cx="16" cy="16" r="6" fill="#1a1a1a"/></svg>
+                        </div>
+                        <div class="flow-label">零件</div>
+                        <div class="flow-sub">点 · 元</div>
+                    </div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-step">
+                        <div class="flow-shape">
+                            <svg width="48" height="32"><line x1="4" y1="16" x2="44" y2="16" stroke="#666" stroke-width="3" stroke-linecap="round"/></svg>
+                        </div>
+                        <div class="flow-label">组件</div>
+                        <div class="flow-sub">线 · 延伸</div>
+                    </div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-step">
+                        <div class="flow-shape">
+                            <svg width="48" height="48"><rect x="4" y="4" width="40" height="40" fill="#999" rx="2"/></svg>
+                        </div>
+                        <div class="flow-label">成品</div>
+                        <div class="flow-sub">面 · 展开</div>
+                    </div>
+                </div>
+                <div class="card-insight">
+                    一颗螺丝钉是<strong>点</strong>——它的直径、螺纹、材质，每一个细节都经过设计。
+                    多颗螺丝和零件组装成<strong>组件</strong>——发动机、变速箱，零件之间的连接关系决定了性能。
+                    组件集成成为<strong>成品</strong>——一辆汽车，一个系统。
+                    <br><br>
+                    <strong>丰田的启示：</strong>做好每一颗螺丝钉（点），才能造出可靠的汽车（面）。
+                    局部不扎实，系统必然脆弱。
+                </div>
+            </div>
+
+            <!-- 教育学习 -->
+            <div class="industry-card">
+                <div class="card-top">
+                    <div class="card-icon-wrap edu">
+                        <svg width="24" height="24"><line x1="4" y1="12" x2="20" y2="12" stroke="white" stroke-width="2.5" stroke-linecap="round"/></svg>
+                    </div>
+                    <div>
+                        <div class="card-name">教育学习</div>
+                        <div class="card-tag">知识点 → 知识线 → 知识面</div>
+                    </div>
+                </div>
+                <div class="card-flow">
+                    <div class="flow-step">
+                        <div class="flow-shape">
+                            <svg width="32" height="32"><circle cx="16" cy="16" r="6" fill="#1a1a1a"/></svg>
+                        </div>
+                        <div class="flow-label">知识点</div>
+                        <div class="flow-sub">点 · 元</div>
+                    </div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-step">
+                        <div class="flow-shape">
+                            <svg width="48" height="32"><line x1="4" y1="16" x2="44" y2="16" stroke="#666" stroke-width="3" stroke-linecap="round"/></svg>
+                        </div>
+                        <div class="flow-label">知识线</div>
+                        <div class="flow-sub">线 · 延伸</div>
+                    </div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-step">
+                        <div class="flow-shape">
+                            <svg width="48" height="48"><rect x="4" y="4" width="40" height="40" fill="#999" rx="2"/></svg>
+                        </div>
+                        <div class="flow-label">知识面</div>
+                        <div class="flow-sub">面 · 展开</div>
+                    </div>
+                </div>
+                <div class="card-insight">
+                    一个公式、一个概念是<strong>知识点</strong>——死记硬背只是收集散落的点。
+                    理解公式之间的推导关系，形成<strong>知识线</strong>——知道「为什么」比「是什么」更重要。
+                    多条知识线交织，形成<strong>知识面</strong>——能跨领域思考，能解决真实问题。
+                    <br><br>
+                    <strong>费曼的启示：</strong>真正的学习不是收集知识点，而是把它们连成线、织成面。
+                    能用自己的话解释清楚，才算真正理解。
+                </div>
+            </div>
+
+            <!-- 软件开发 -->
+            <div class="industry-card">
+                <div class="card-top">
+                    <div class="card-icon-wrap dev">
+                        <svg width="24" height="24"><rect x="4" y="4" width="16" height="16" fill="white" rx="2"/></svg>
+                    </div>
+                    <div>
+                        <div class="card-name">软件开发</div>
+                        <div class="card-tag">函数 → 模块 → 系统</div>
+                    </div>
+                </div>
+                <div class="card-flow">
+                    <div class="flow-step">
+                        <div class="flow-shape">
+                            <svg width="32" height="32"><circle cx="16" cy="16" r="6" fill="#1a1a1a"/></svg>
+                        </div>
+                        <div class="flow-label">函数</div>
+                        <div class="flow-sub">点 · 元</div>
+                    </div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-step">
+                        <div class="flow-shape">
+                            <svg width="48" height="32"><line x1="4" y1="16" x2="44" y2="16" stroke="#666" stroke-width="3" stroke-linecap="round"/></svg>
+                        </div>
+                        <div class="flow-label">模块</div>
+                        <div class="flow-sub">线 · 延伸</div>
+                    </div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-step">
+                        <div class="flow-shape">
+                            <svg width="48" height="48"><rect x="4" y="4" width="40" height="40" fill="#999" rx="2"/></svg>
+                        </div>
+                        <div class="flow-label">系统</div>
+                        <div class="flow-sub">面 · 展开</div>
+                    </div>
+                </div>
+                <div class="card-insight">
+                    一个函数是<strong>点</strong>——做好一件事，输入输出清晰，职责单一。
+                    函数组合成<strong>模块</strong>——用户模块、订单模块、支付模块，每个模块是一条完整的业务线。
+                    模块协作构成<strong>系统</strong>——整个产品的架构，模块之间的接口和协议决定了系统的可扩展性。
+                    <br><br>
+                    <strong>Unix 的启示：</strong>写好每一个小工具（点），让它们通过管道连接（线），组合成强大的系统（面）。
+                    Do one thing and do it well.
+                </div>
+            </div>
+
+            <!-- 写作表达 -->
+            <div class="industry-card">
+                <div class="card-top">
+                    <div class="card-icon-wrap writing">
+                        <svg width="24" height="24"><rect x="4" y="4" width="16" height="16" fill="white" rx="2" opacity="0.6"/></svg>
+                    </div>
+                    <div>
+                        <div class="card-name">写作表达</div>
+                        <div class="card-tag">字 → 句 → 篇章</div>
+                    </div>
+                </div>
+                <div class="card-flow">
+                    <div class="flow-step">
+                        <div class="flow-shape">
+                            <svg width="32" height="32"><circle cx="16" cy="16" r="6" fill="#1a1a1a"/></svg>
+                        </div>
+                        <div class="flow-label">字 / 词</div>
+                        <div class="flow-sub">点 · 元</div>
+                    </div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-step">
+                        <div class="flow-shape">
+                            <svg width="48" height="32"><line x1="4" y1="16" x2="44" y2="16" stroke="#666" stroke-width="3" stroke-linecap="round"/></svg>
+                        </div>
+                        <div class="flow-label">句 / 段</div>
+                        <div class="flow-sub">线 · 延伸</div>
+                    </div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-step">
+                        <div class="flow-shape">
+                            <svg width="48" height="48"><rect x="4" y="4" width="40" height="40" fill="#999" rx="2"/></svg>
+                        </div>
+                        <div class="flow-label">篇章</div>
+                        <div class="flow-sub">面 · 展开</div>
+                    </div>
+                </div>
+                <div class="card-insight">
+                    一个字、一个词是<strong>点</strong>——精准用词，每个字都有分量。
+                    字词组成<strong>句子和段落</strong>——有逻辑、有节奏、有起承转合。
+                    段落构成<strong>篇章</strong>——有主题、有结构、有完整的表达。
+                    <br><br>
+                    <strong>海明威的启示：</strong>用最短的句子（线），承载最重的意思（点），构建最干净的文章（面）。
+                    删掉每一个不必要的字。
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- ==================== FINALE ==================== -->
+<div class="finale">
+    <div class="finale-inner">
+        <div class="finale-text">
+            做事如设计：<br><br>
+            先看见<span class="hl">一个点</span>，<br>
+            再连成<span class="hl">一条线</span>，<br>
+            最后展开成<span class="hl">一个面</span>。<br><br>
+            然后，重新看见下一个点。
+        </div>
+        <div class="finale-attr">—— 点线面做事法</div>
+    </div>
+</div>
+
+<footer>
+    灵感来自 NHK《啊！设计》(デザインあ) · 佐藤卓 · 点线面大中小黑白灰
+</footer>
+
+<script>
+const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+        }
+    });
+}, { threshold: 0.15 });
+
+document.querySelectorAll('.chapter, .interlude, .method-section, .industry-section, .finale').forEach(el => {
+    observer.observe(el);
+});
+</script>
+
+</body>
+</html>
